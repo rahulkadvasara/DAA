@@ -11,6 +11,7 @@ struct Item {
     int item;
     int weight;
     int profit;
+
 };
 
 void merge(struct Item arr[], int l, int m, int r) {
@@ -26,8 +27,8 @@ void merge(struct Item arr[], int l, int m, int r) {
 
     int i = 0, j = 0, k = l;
     while (i < n1 && j < n2) {
-        double r1 = (double)L[i].profit / L[i].weight;
-        double r2 = (double)R[j].profit / R[j].weight;
+        float r1 = (float)L[i].profit / L[i].weight;
+        float r2 = (float)R[j].profit / R[j].weight;
         if (r1 >= r2) {
             arr[k] = L[i];
             i++;
@@ -62,23 +63,23 @@ void mergeSort(struct Item arr[], int l, int r) {
     }
 }
 
-double fractionalKnapsack(int W, struct Item arr[], int n) {
+float fractionalKnapsack(int W, struct Item arr[], int n) {
     mergeSort(arr, 0, n - 1);
 
     int curWeight = 0;
     printf("Items taken:\n");
     printf("ID\tWeight\tProfit\tQuantity\tTotal Profit\n");
-    double finalprofit = 0.0;
+    float finalprofit = 0.0;
 
     for (int i = 0; i < n; i++) {
         if (curWeight + arr[i].weight <= W) {
             curWeight += arr[i].weight;
             finalprofit += arr[i].profit;
-            printf("%d\t%d\t%d\t%d\t\t%.2f\n", arr[i].item, arr[i].weight, arr[i].profit, 1, (double)arr[i].profit);
+            printf("%d\t%d\t%d\t%d\t\t%.2f\n", arr[i].item, arr[i].weight, arr[i].profit, 1, (float)arr[i].profit);
         } else {
             int remain = W - curWeight;
-            finalprofit += arr[i].profit * ((double)remain / arr[i].weight);
-            printf("%d\t%d\t%d\t%.2f\t\t%.2f\n", arr[i].item, arr[i].weight, arr[i].profit, (double)remain / arr[i].weight, arr[i].profit * ((double)remain / arr[i].weight));
+            finalprofit += arr[i].profit * ((float)remain / arr[i].weight);
+            printf("%d\t%d\t%d\t%.2f\t\t%.2f\n", arr[i].item, arr[i].weight, arr[i].profit, (float)remain / arr[i].weight, arr[i].profit * ((float)remain / arr[i].weight));
             break;
         }
     }
