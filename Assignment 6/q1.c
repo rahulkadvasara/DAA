@@ -98,7 +98,7 @@ void printJobScheduling(Job arr[], int n) {
 }
 
 int main() {
-    Job arr[] = {{1, 100, 2}, {2, 19, 1}, {3, 27, 2}, {4, 25, 1}, {5, 15, 3}};
+    Job arr[] = {{1, 500, 5}, {2, 400, 3}, {3, 1200, 3}, {4, 700, 2}, {5, 750, 4}, {6, 1100, 2}};
     int n = sizeof(arr) / sizeof(arr[0]);
     printJobScheduling(arr, n);
     return 0;

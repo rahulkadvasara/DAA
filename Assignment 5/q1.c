@@ -5,93 +5,102 @@
 
 
 #include <stdio.h>
-#include <stdlib.h>
 
-struct Item {
-    int item;
+typedef struct {
     int weight;
-    int profit;
+    int value;
+    double ratio;
+    int index;
+} Item;
 
-};
+void merge(Item items[], int left, int mid, int right) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
 
-void merge(struct Item arr[], int l, int m, int r) {
-    int n1 = m - l + 1;
-    int n2 = r - m;
-
-    struct Item L[n1], R[n2];
+    Item L[n1], R[n2];
 
     for (int i = 0; i < n1; i++)
-        L[i] = arr[l + i];
-    for (int j = 0; j < n2; j++)
-        R[j] = arr[m + 1 + j];
+        L[i] = items[left + i];
+    for (int i = 0; i < n2; i++)
+        R[i] = items[mid + 1 + i];
 
-    int i = 0, j = 0, k = l;
+    int i = 0, j = 0, k = left;
+
     while (i < n1 && j < n2) {
-        float r1 = (float)L[i].profit / L[i].weight;
-        float r2 = (float)R[j].profit / R[j].weight;
-        if (r1 >= r2) {
-            arr[k] = L[i];
+        if (L[i].ratio >= R[j].ratio) {
+            items[k] = L[i];
             i++;
         } else {
-            arr[k] = R[j];
+            items[k] = R[j];
             j++;
         }
         k++;
     }
 
     while (i < n1) {
-        arr[k] = L[i];
+        items[k] = L[i];
         i++;
         k++;
     }
 
     while (j < n2) {
-        arr[k] = R[j];
+        items[k] = R[j];
         j++;
         k++;
     }
 }
 
-void mergeSort(struct Item arr[], int l, int r) {
-    if (l < r) {
-        int m = l + (r - l) / 2;
-
-        mergeSort(arr, l, m);
-        mergeSort(arr, m + 1, r);
-
-        merge(arr, l, m, r);
+void mergeSort(Item items[], int left, int right) {
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+        mergeSort(items, left, mid);
+        mergeSort(items, mid + 1, right);
+        merge(items, left, mid, right);
     }
 }
 
-float fractionalKnapsack(int W, struct Item arr[], int n) {
-    mergeSort(arr, 0, n - 1);
+double fractionalKnapsack(Item items[], int n, int capacity) {
+    mergeSort(items, 0, n - 1);
 
-    int curWeight = 0;
-    printf("Items taken:\n");
-    printf("ID\tWeight\tProfit\tQuantity\tTotal Profit\n");
-    float finalprofit = 0.0;
+    double totalValue = 0.0;
+    int currentWeight = 0;
 
     for (int i = 0; i < n; i++) {
-        if (curWeight + arr[i].weight <= W) {
-            curWeight += arr[i].weight;
-            finalprofit += arr[i].profit;
-            printf("%d\t%d\t%d\t%d\t\t%.2f\n", arr[i].item, arr[i].weight, arr[i].profit, 1, (float)arr[i].profit);
+        if (currentWeight + items[i].weight <= capacity) {
+            currentWeight += items[i].weight;
+            totalValue += items[i].value;
+            printf("Taking full item %d (Weight: %d, Value: %d)\n", items[i].index, items[i].weight, items[i].value);
         } else {
-            int remain = W - curWeight;
-            finalprofit += arr[i].profit * ((float)remain / arr[i].weight);
-            printf("%d\t%d\t%d\t%.2f\t\t%.2f\n", arr[i].item, arr[i].weight, arr[i].profit, (float)remain / arr[i].weight, arr[i].profit * ((float)remain / arr[i].weight));
+            int remainingWeight = capacity - currentWeight;
+            double fraction = (double)remainingWeight / items[i].weight;
+            totalValue += items[i].value * fraction;
+            printf("Taking %.2f%% of item %d (Weight: %d, Value: %d)\n", fraction * 100, items[i].index, items[i].weight, items[i].value);
             break;
         }
     }
 
-    return finalprofit;
+    return totalValue;
 }
 
 int main() {
-    int W = 60; // Maximum weight the thief can carry
-    struct Item arr[] = {{1, 5, 30}, {2, 10, 40}, {3, 15, 45}, {4, 22, 77}, {5, 25, 90}};
-    int n = sizeof(arr) / sizeof(arr[0]);
+    Item items[] = {
+        {5, 30, 0, 1},
+        {10, 40, 0, 2},
+        {15, 45, 0, 3},
+        {22, 77, 0, 4},
+        {25, 90, 0, 5}
+    };
 
-    printf("Maximum profit we can obtain = %.2f\n", fractionalKnapsack(W, arr, n));
+    int n = sizeof(items) / sizeof(items[0]);
+    int capacity = 60;
+
+    // Calculate value-to-weight ratio
+    for (int i = 0; i < n; i++) {
+        items[i].ratio = (double)items[i].value / items[i].weight;
+    }
+
+    double maxValue = fractionalKnapsack(items, n, capacity);
+    printf("Maximum Value in Knapsack = %.2f\n", maxValue);
+
     return 0;
 }
