@@ -6,20 +6,18 @@
 
 
 #include <stdio.h>
-#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 
-// Structure to represent a job
 typedef struct {
-    int id;
-    int profit;
+    char car[30];
     int deadline;
+    int profit;
 } Job;
 
-// Merge function for Merge Sort
 void merge(Job jobs[], int left, int mid, int right) {
     int n1 = mid - left + 1;
     int n2 = right - mid;
-
     Job L[n1], R[n2];
 
     for (int i = 0; i < n1; i++)
@@ -38,13 +36,11 @@ void merge(Job jobs[], int left, int mid, int right) {
         }
         k++;
     }
-
     while (i < n1) {
         jobs[k] = L[i];
         i++;
         k++;
     }
-
     while (j < n2) {
         jobs[k] = R[j];
         j++;
@@ -52,7 +48,6 @@ void merge(Job jobs[], int left, int mid, int right) {
     }
 }
 
-// Merge Sort function
 void mergeSort(Job jobs[], int left, int right) {
     if (left < right) {
         int mid = left + (right - left) / 2;
@@ -62,7 +57,6 @@ void mergeSort(Job jobs[], int left, int right) {
     }
 }
 
-// Function to find the maximum deadline
 int findMaxDeadline(Job jobs[], int n) {
     int maxDeadline = 0;
     for (int i = 0; i < n; i++) {
@@ -72,61 +66,53 @@ int findMaxDeadline(Job jobs[], int n) {
     return maxDeadline;
 }
 
-// Function to schedule jobs for maximum profit
 void jobScheduling(Job jobs[], int n) {
-    // Sort jobs based on profit in descending order
     mergeSort(jobs, 0, n - 1);
 
     int maxDeadline = findMaxDeadline(jobs, n);
-    int slot[maxDeadline];  // To store job ID scheduled at each time slot
-    bool slotFilled[maxDeadline];  // To check if the slot is filled
+    Job schedule[maxDeadline];
+    int slot[maxDeadline]; 
 
     for (int i = 0; i < maxDeadline; i++) {
-        slotFilled[i] = false;
-        slot[i] = -1;
+        slot[i] = 0;
     }
 
-    int totalProfit = 0, jobsCompleted = 0;
+    int totalProfit = 0;
 
     for (int i = 0; i < n; i++) {
         for (int j = jobs[i].deadline - 1; j >= 0; j--) {
-            if (!slotFilled[j]) {
-                slot[j] = jobs[i].id;
-                slotFilled[j] = true;
+            if (slot[j] == 0) {
+                slot[j] = 1;
+                schedule[j] = jobs[i];
                 totalProfit += jobs[i].profit;
-                jobsCompleted++;
                 break;
             }
         }
     }
-
-    // Print scheduled jobs
     printf("Optimal Job Schedule: ");
     for (int i = 0; i < maxDeadline; i++) {
-        if (slotFilled[i])
-            printf("Job %d ", slot[i]);
+        if (slot[i] == 1) {
+            printf("Slot %d -> %s (Profit: %d)\n", i + 1, schedule[i].car, schedule[i].profit);
+        }
     }
-    printf("\n");
-
-    // Print results
-    printf("Are all jobs completed? %s\n", (jobsCompleted == n) ? "Yes" : "No");
-    printf("Maximum Earned Profit: %d\n", totalProfit);
+    printf("\nMaximum Earned Profit: %d\n", totalProfit);
 }
 
-// Driver function
 int main() {
     Job jobs[] = {
-        {1, 500, 2},
-        {2, 400, 1},
-        {3, 1200, 1},
-        {4, 700, 1},
-        {5, 750, 2},
-        {6, 1100, 3}
+        {"Maruti WagonR", 5, 500},
+        {"Nissan Micra", 3, 400},
+        {"Toyota Innova", 3, 1200},
+        {"TATA Nexon", 2, 700},
+        {"Renault Kiger", 4, 750},
+        {"Maruti Grand Vitara", 2, 1100}
     };
 
     int n = sizeof(jobs) / sizeof(jobs[0]);
-
+    
     jobScheduling(jobs, n);
+    printf("Are all jobs completed? %s\n", (findMaxDeadline(jobs,6) == n) ? "Yes" : "No");
+
 
     return 0;
 }

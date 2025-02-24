@@ -94,7 +94,6 @@ int main() {
     int n = sizeof(items) / sizeof(items[0]);
     int capacity = 60;
 
-    // Calculate value-to-weight ratio
     for (int i = 0; i < n; i++) {
         items[i].ratio = (double)items[i].value / items[i].weight;
     }
